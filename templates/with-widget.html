@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Without shared WebWorker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+  </head>
+  <body>
+    <section class="section is-marginless is-paddingless">
+      <div class="container">
+        <div class="card">
+          <div class="card-content has-background-primary">
+            <p class="title is-1 has-text-white-bis has-text-centered is-family-code">
+              <span id="count"></span>
+            </p>
+          </div>
+          <footer class="card-footer has-background-warning">
+            <p class="card-footer-item has-text-grey-dark is-size-7 has-text-weight-regular">
+              <span>
+                Connections updated: <span id="updated"></span>
+              </span>
+            </p>
+          </footer>
+        </div>
+      </div>
+    </section>
+  </body>
+
+  <script>
+    const worker = new SharedWorker('static/js/shared-worker.js')
+
+    worker.port.onmessage = function(e) {
+      var data = e.data
+      var totalConnections = data['connections']
+      var lastUpdated = data['updated']
+
+      document.querySelector('#count').textContent = totalConnections
+      document.querySelector('#updated').textContent = lastUpdated
+    }
+
+    worker.port.start()
+  </script>
+</html>

@@ -21,6 +21,11 @@ class ClientWith(tornado.web.RequestHandler):
         self.render("templates/with.html")
 
 
+class ClientWithWidget(tornado.web.RequestHandler):
+    def get(self):
+        self.render("templates/with-widget.html")
+
+
 class WebSocketClientCounter(tornado.websocket.WebSocketHandler):
 
     connected_clients = []
@@ -59,6 +64,7 @@ if __name__ == "__main__":
             (r"/without", ClientWithout),
             (r"/without-widget", ClientWithoutWidget),
             (r"/with", ClientWith),
+            (r"/with-widget", ClientWithWidget),
         ],
         debug=True,
         autoreload=True,
