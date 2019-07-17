@@ -43,6 +43,9 @@ class WebSocketClientCounter(tornado.websocket.WebSocketHandler):
         self.update_clients()
         logger.warning(f"Client disconnected [{len(self.connected_clients)}]")
 
+    def on_message(self, message):
+        self.update_clients()
+
     def update_clients(self):
         utc = arrow.utcnow()
         for connected_client in self.connected_clients:

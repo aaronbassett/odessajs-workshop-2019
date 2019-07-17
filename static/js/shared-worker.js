@@ -15,5 +15,12 @@ onconnect = function(e) {
         connection.postMessage(data)
       })
     }
+
+    setInterval(function() {
+      console.log('Keeping alive')
+      sharedWebSocket.send("Keep Alive")
+    }, 5000)
+  } else {
+    sharedWebSocket.send("Ping")
   }
 }
