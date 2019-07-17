@@ -1,0 +1,7 @@
+pip-tools
+black
+pylint
+flake8
+logzero
+
+tornado
