@@ -87,8 +87,8 @@ class EventSource(tornado.web.RequestHandler):
     def initialize(self, source):
         self.source = source
         self._last = None
-        self.set_header('content-type', 'text/event-stream')
-        self.set_header('cache-control', 'no-cache')
+        self.set_header("content-type", "text/event-stream")
+        self.set_header("cache-control", "no-cache")
 
     @gen.coroutine
     def publish(self, data):
@@ -117,6 +117,17 @@ class SSEWithoutWidget(tornado.web.RequestHandler):
     def get(self):
         self.render("templates/sse-without-widget.html")
 
+
+class SSEWith(tornado.web.RequestHandler):
+    def get(self):
+        self.render("templates/sse-with.html")
+
+
+class SSEWithWidget(tornado.web.RequestHandler):
+    def get(self):
+        self.render("templates/sse-with-widget.html")
+
+
 if __name__ == "__main__":
 
     generator = fibonacci()
@@ -136,9 +147,11 @@ if __name__ == "__main__":
             (r"/without-widget", ClientWithoutWidget),
             (r"/with", ClientWith),
             (r"/with-widget", ClientWithWidget),
-            (r'/sse', EventSource, dict(source=publisher)),
+            (r"/sse", EventSource, dict(source=publisher)),
             (r"/sse-without", SSEWithout),
             (r"/sse-without-widget", SSEWithoutWidget),
+            (r"/sse-with", SSEWith),
+            (r"/sse-with-widget", SSEWithWidget),
         ],
         debug=True,
         autoreload=True,
