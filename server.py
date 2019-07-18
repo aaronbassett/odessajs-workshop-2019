@@ -33,17 +33,20 @@ class ClientWithWidget(tornado.web.RequestHandler):
 class WebSocketClientCounter(tornado.websocket.WebSocketHandler):
 
     connected_clients = []
+    connections_last_updated = None
 
     def check_origin(self, origin):
         return True
 
     def open(self):
         WebSocketClientCounter.connected_clients.append(self)
+        self.connections_last_updated = arrow.utcnow()
         self.update_clients()
         logger.info(f"Client connected [{len(self.connected_clients)}]")
 
     def on_close(self):
         WebSocketClientCounter.connected_clients.remove(self)
+        self.connections_last_updated = arrow.utcnow()
         self.update_clients()
         logger.warning(f"Client disconnected [{len(self.connected_clients)}]")
 
@@ -51,13 +54,12 @@ class WebSocketClientCounter(tornado.websocket.WebSocketHandler):
         self.update_clients()
 
     def update_clients(self):
-        utc = arrow.utcnow()
         for connected_client in self.connected_clients:
             connected_client.write_message(
                 json.dumps(
                     {
                         "connections": len(self.connected_clients),
-                        "updated": utc.humanize(),
+                        "updated": self.connections_last_updated.humanize(),
                     }
                 )
             )
