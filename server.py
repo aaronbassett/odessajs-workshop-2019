@@ -1,5 +1,7 @@
 import json
+import signal
 import tornado.websocket
+from tornado.ioloop import IOLoop, PeriodicCallback
 import arrow
 from logzero import logfile, logger
 
@@ -59,7 +61,37 @@ class WebSocketClientCounter(tornado.websocket.WebSocketHandler):
             )
 
 
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+
+
+class DataSource(object):
+    def __init__(self, initial_data=None):
+        self._data = initial_data
+
+    @property
+    def data(self):
+        return self._data
+
+    @data.setter
+    def data(self, new_data):
+        self._data = new_data
+
+
 if __name__ == "__main__":
+
+    generator = fibonacci()
+    publisher = DataSource(next(generator))
+
+    def get_next():
+        publisher.data = next(generator)
+
+    checker = PeriodicCallback(lambda: get_next(), 1000.0)
+    checker.start()
+
     app = tornado.web.Application(
         [
             (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "static"}),
@@ -75,4 +107,5 @@ if __name__ == "__main__":
     app.listen(8000)
 
     logger.debug("Starting WebSocket server")
-    tornado.ioloop.IOLoop.current().start()
+    signal.signal(signal.SIGINT, lambda x, y: IOLoop.instance().stop())
+    IOLoop.instance().start()
